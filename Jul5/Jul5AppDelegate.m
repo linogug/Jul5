@@ -7,24 +7,56 @@
 //
 
 #import "Jul5AppDelegate.h"
+#import "View.h"
+#import "Puzzle.h"
 
 @implementation Jul5AppDelegate
-
 @synthesize window = _window;
 
-- (void)dealloc
+- (BOOL) application: (UIApplication *) application didFinishLaunchingWithOptions: (NSDictionary *) launchOptions
 {
-	[_window release];
-    [super dealloc];
+	// Override point for customization after application launch.
+	NSBundle *bundle = [NSBundle mainBundle];
+	NSLog(@"bundle.bundlePath == \"%@\"", bundle.bundlePath);	
+	
+	NSString *filename = [bundle pathForResource: @"gun" ofType: @"mp3"];
+	NSLog(@"filename == \"%@\"", filename);
+	
+	NSURL *url = [NSURL fileURLWithPath: filename isDirectory: NO];
+	NSLog(@"url == \"%@\"", url);
+	
+	OSStatus error = AudioServicesCreateSystemSoundID((__bridge CFURLRef)url, &sid);
+	if (error != kAudioServicesNoError) {
+		NSLog(@"AudioServicesCreateSystemSoundID error == %ld", error);
+	}
+	
+	UIScreen *screen = [UIScreen mainScreen];
+	//view = [[View alloc] initWithFrame:(];
+	self.window = [[UIWindow alloc] initWithFrame: screen.bounds];
+	self.window.backgroundColor = [UIColor whiteColor];
+	
+	view = [[View alloc] initWithFrame: screen.applicationFrame];
+	//self.window = [[UIWindow alloc] initWithFrame: screen.bounds];	
+	
+	
+	[self.window makeKeyAndVisible];
+	[self.window addSubview: view];
+//	[self.window addSubview: puzzle];	
+	return YES;
 }
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
-{
-    self.window = [[[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
-    // Override point for customization after application launch.
-    self.window.backgroundColor = [UIColor whiteColor];
-    [self.window makeKeyAndVisible];
-    return YES;
+- (void) touchUpInside: (id) sender {
+	//The sender is the button that was pressed.
+	
+	NSLog(@"The \"%@\" button was pressed.",
+		  [sender titleForState: UIControlStateNormal]);
+	
+	//AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+	AudioServicesPlaySystemSound(sid);
+}
+
+- (void) playSound {
+AudioServicesPlaySystemSound(sid);
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application
